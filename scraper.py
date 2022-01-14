@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 YOUTUBE_TRENDING_URL ='https://www.youtube.com/feed/trending'
 
 def getDriver():
@@ -9,16 +10,25 @@ def getDriver():
     chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(options=chrome_options)
     return driver
+def get_videos(driver):
+    VIDEO_DIV_TAG = 'ytd-video-renderer'
+    driver.get(YOUTUBE_TRENDING_URL)
+    videos = driver.find_elements(By.TAG_NAME, VIDEO_DIV_TAG)
+    return videos
 if __name__ == "__main__":
+  print('Creating Driver...')
   driver=getDriver()
 
 print('Fetching The page')
 
-driver.get(YOUTUBE_TRENDING_URL)
-print('Page Title: ',driver.title)
-print('Get the video divs')
-VIDEO_DIV_TAG = 'ytd-video-renderer'
+videos = get_videos(driver)
 
-video_divs = driver.find_elements_by_tag_name('VIDEO_DIV_TAG')
 
-print(f'Found {len(video_divs)}videos')
+print(f'Found {len(videos)}videos')
+
+print('Parsing the First Video')
+
+video = videos[0]
+title_tag = video.find_elements(By.ID,'video-title')
+title = title_tag.text
+print(title)
